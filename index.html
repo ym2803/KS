@@ -36,13 +36,37 @@
     border-bottom:2px solid var(--ink);
     background:var(--paper);
   }
+  .header-top{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:6px;
+  }
+  .view-toggle{
+    display:flex;
+    gap:0;
+    border:1px solid var(--ink);
+  }
+  .view-btn{
+    font-family:var(--mono);
+    font-size:11px;
+    background:#fff;
+    color:var(--ink);
+    border:none;
+    padding:6px 12px;
+    cursor:pointer;
+    border-right:1px solid var(--ink);
+  }
+  .view-btn:last-child{border-right:none;}
+  .view-btn.active{background:var(--ink);color:#fff;}
   .eyebrow{
     font-family:var(--mono);
     font-size:11px;
     letter-spacing:.14em;
     text-transform:uppercase;
     color:var(--amber);
-    margin-bottom:6px;
+    margin-bottom:0;
   }
   h1{
     margin:0;
@@ -58,6 +82,33 @@
     line-height:1.5;
   }
   main{max-width:1180px;margin:0 auto;padding:26px 32px 80px;}
+
+  /* ---- Mobile display mode (auto-detected or manually toggled) ---- */
+  html.force-mobile header{padding:16px 14px 12px;}
+  html.force-mobile h1{font-size:19px;}
+  html.force-mobile .sub{font-size:12.5px;}
+  html.force-mobile main{padding:16px 12px 60px;}
+  html.force-mobile .inputs{grid-template-columns:1fr;gap:14px;}
+  html.force-mobile .card-body{padding:12px;}
+  html.force-mobile .card-head{padding:10px 12px;}
+  html.force-mobile .summary{grid-template-columns:repeat(2,1fr);}
+  html.force-mobile .stat{padding:12px 10px;}
+  html.force-mobile .stat .num{font-size:21px;}
+  html.force-mobile .toolbar{flex-direction:column;align-items:flex-start;gap:12px;}
+  html.force-mobile .toolbar-group{flex-wrap:wrap;}
+  html.force-mobile .runbar{flex-wrap:wrap;gap:10px;}
+  html.force-mobile button.run{padding:11px 18px;font-size:12px;}
+  html.force-mobile .scan-fields{grid-template-columns:1fr 1fr;}
+  html.force-mobile .scan-fields button.scan-add{grid-column:1 / -1;}
+  html.force-mobile .gsheet-row{flex-direction:column;align-items:stretch;}
+  html.force-mobile .gsheet-generated{flex-direction:column;align-items:flex-start;}
+  html.force-mobile .group{overflow-x:auto;}
+  html.force-mobile .group table{min-width:640px;font-size:11.5px;}
+  html.force-mobile .group-head{flex-direction:column;align-items:flex-start;gap:4px;}
+  html.force-mobile .group-head .counts{margin-left:0;}
+  html.force-mobile .filerow{flex-wrap:wrap;}
+  html.force-mobile .mode-toggle{width:100%;}
+  html.force-mobile .mode-btn{flex:1;}
 
   .inputs{
     display:grid;
@@ -267,6 +318,219 @@
   .toolbar-group .divider{
     width:1px;height:20px;background:var(--line);
   }
+
+  .mode-toggle{
+    display:flex;
+    gap:0;
+    margin-bottom:12px;
+    border:1px solid var(--ink);
+    width:fit-content;
+  }
+  .mode-btn{
+    font-family:var(--mono);
+    font-size:11.5px;
+    letter-spacing:.03em;
+    text-transform:uppercase;
+    background:#fff;
+    color:var(--ink);
+    border:none;
+    padding:8px 14px;
+    cursor:pointer;
+    border-right:1px solid var(--ink);
+  }
+  .mode-btn:last-child{border-right:none;}
+  .mode-btn.active{background:var(--ink);color:#fff;}
+
+  .scan-fields{
+    display:grid;
+    grid-template-columns:1fr 1fr 90px auto;
+    gap:8px;
+    align-items:end;
+    margin-bottom:8px;
+  }
+  .scan-field{display:flex;flex-direction:column;gap:4px;}
+  .scan-field label{
+    font-family:var(--mono);
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:.05em;
+    color:#4a5259;
+  }
+  .scan-field input{
+    font-family:var(--mono);
+    font-size:13px;
+    padding:9px 10px;
+    border:1px solid var(--line);
+    background:#fbfbfa;
+    color:var(--ink);
+  }
+  .scan-field input:focus{outline:2px solid var(--ink);outline-offset:1px;border-color:var(--ink);}
+  button.scan-add{
+    font-family:var(--mono);
+    font-size:12px;
+    background:var(--amber);
+    color:#fff;
+    border:none;
+    padding:9px 14px;
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .scan-hint{
+    font-size:11px;
+    color:#4a5259;
+    margin-bottom:14px;
+    line-height:1.4;
+  }
+  .scan-log-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:6px;
+  }
+  #scanCount{
+    font-family:var(--mono);
+    font-size:11.5px;
+    font-weight:600;
+  }
+  button.scan-clear{
+    font-family:var(--mono);
+    font-size:10.5px;
+    background:transparent;
+    border:1px solid var(--line);
+    color:#4a5259;
+    padding:4px 9px;
+    cursor:pointer;
+  }
+  .scan-log-wrap{
+    border:1px solid var(--line);
+    max-height:220px;
+    overflow-y:auto;
+  }
+  table.scan-log-table{width:100%;border-collapse:collapse;font-size:11.5px;}
+  table.scan-log-table thead th{
+    position:sticky; top:0;
+    background:#f5f6f4;
+    font-family:var(--mono);
+    font-size:9.5px;
+    text-transform:uppercase;
+    color:#4a5259;
+    padding:6px 8px;
+    text-align:left;
+    border-bottom:1px solid var(--line);
+  }
+  table.scan-log-table tbody td{
+    padding:6px 8px;
+    border-bottom:1px solid var(--line);
+    font-family:var(--mono);
+  }
+  table.scan-log-table tbody tr:last-child td{border-bottom:none;}
+  .scan-log-del{
+    background:transparent;border:none;color:var(--red);cursor:pointer;
+    font-family:var(--mono);font-size:11px;
+  }
+  .scan-log-empty{
+    padding:16px;text-align:center;font-family:var(--mono);font-size:11px;color:#8a9096;
+  }
+
+  .gsheet-card{margin-bottom:22px;}
+  .tag.gsheet{background:#3a7a5c;color:#fff;border-color:#3a7a5c;}
+  .gsheet-row{
+    display:flex;
+    gap:10px;
+    margin-bottom:10px;
+  }
+  .gsheet-row input{
+    flex:1;
+    font-family:var(--mono);
+    font-size:12.5px;
+    padding:10px 12px;
+    border:1px solid var(--line);
+    background:#fbfbfa;
+    color:var(--ink);
+  }
+  .gsheet-row input:focus{outline:2px solid var(--ink);outline-offset:1px;}
+  button.gsheet-load{
+    font-family:var(--mono);
+    font-size:12px;
+    letter-spacing:.03em;
+    text-transform:uppercase;
+    background:#3a7a5c;
+    color:#fff;
+    border:none;
+    padding:10px 18px;
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .gsheet-status{
+    font-family:var(--mono);
+    font-size:11.5px;
+    color:#4a5259;
+    margin-bottom:6px;
+  }
+  .gsheet-generated{
+    font-family:var(--mono);
+    font-size:11.5px;
+    color:#4a5259;
+    margin-bottom:8px;
+    padding:8px 10px;
+    background:#f5f6f4;
+    border:1px solid var(--line);
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .gsheet-generated a{
+    color:var(--blue);
+    word-break:break-all;
+  }
+  button.gsheet-copy{
+    font-family:var(--mono);
+    font-size:10.5px;
+    background:transparent;
+    border:1px solid var(--ink);
+    padding:4px 9px;
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .gsheet-status.ok{color:#3a7a5c;}
+  .gsheet-status.err{color:var(--red);}
+  .gsheet-note{
+    font-size:11px;
+    color:#8a9096;
+    line-height:1.5;
+  }
+  .gsheet-divider{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin:16px 0 10px;
+    font-family:var(--mono);
+    font-size:10.5px;
+    text-transform:uppercase;
+    letter-spacing:.05em;
+    color:#8a9096;
+  }
+  .gsheet-divider::before, .gsheet-divider::after{
+    content:'';
+    flex:1;
+    height:1px;
+    background:var(--line);
+  }
+  .gsheet-textarea{
+    width:100%;
+    min-height:90px;
+    resize:vertical;
+    font-family:var(--mono);
+    font-size:11.5px;
+    line-height:1.5;
+    border:1px solid var(--line);
+    padding:10px;
+    background:#fbfbfa;
+    color:var(--ink);
+    margin-bottom:8px;
+  }
+  .gsheet-textarea:focus{outline:2px solid var(--ink);outline-offset:1px;}
   .chk{
     display:flex;
     align-items:center;
@@ -344,7 +608,13 @@
 <body>
 
 <header>
-  <div class="eyebrow">Stock Opname · Ledger Audit</div>
+  <div class="header-top">
+    <div class="eyebrow">Stock Opname · Ledger Audit</div>
+    <div class="view-toggle">
+      <button type="button" class="view-btn active" id="viewDesktopBtn">🖥 PC</button>
+      <button type="button" class="view-btn" id="viewMobileBtn">📱 HP</button>
+    </div>
+  </div>
   <h1>Compare Sistem vs Scan</h1>
   <div class="sub">Tempel atau unggah data sistem (data 1) dan data hasil scan (data 2) berformat .txt. Aplikasi akan mencocokkan tiap SKU per alamat, menandai SKU yang belum discan, dan menghitung selisih qty.</div>
 </header>
@@ -371,12 +641,80 @@
         <span class="tag scan">Data 2</span>
       </div>
       <div class="card-body">
-        <textarea id="data2" placeholder="AG13-02,2002020,3&#10;AG13-02,2002022,4&#10;..."></textarea>
-        <div class="filerow">
-          <input type="file" id="file2" accept=".txt,.csv" multiple>
-          <span class="meta" id="meta2">Belum ada file</span>
+        <div class="mode-toggle">
+          <button type="button" class="mode-btn active" id="modeUploadBtn">Tempel / Upload</button>
+          <button type="button" class="mode-btn" id="modeScanBtn">Scan Langsung</button>
+        </div>
+
+        <div id="panelUpload">
+          <textarea id="data2" placeholder="AG13-02,2002020,3&#10;AG13-02,2002022,4&#10;..."></textarea>
+          <div class="filerow">
+            <input type="file" id="file2" accept=".txt,.csv" multiple>
+            <span class="meta" id="meta2">Belum ada file</span>
+          </div>
+        </div>
+
+        <div id="panelScan" style="display:none;">
+          <div class="scan-fields">
+            <div class="scan-field">
+              <label>No CTN</label>
+              <input type="text" id="scanCtn" placeholder="Scan / ketik No CTN" autocomplete="off">
+            </div>
+            <div class="scan-field">
+              <label>SKU</label>
+              <input type="text" id="scanSku" placeholder="Scan / ketik SKU" autocomplete="off">
+            </div>
+            <div class="scan-field">
+              <label>Qty</label>
+              <input type="number" id="scanQty" placeholder="Qty" autocomplete="off" value="1" min="0" step="1">
+            </div>
+            <button type="button" class="scan-add" id="scanAddBtn">+ Tambah</button>
+          </div>
+          <div class="scan-hint">Scan No CTN → Enter → scan SKU → Enter → isi/scan Qty → Enter untuk menambah baris. Fokus otomatis kembali ke No CTN.</div>
+
+          <div class="scan-log-head">
+            <span id="scanCount">0 baris discan</span>
+            <button type="button" class="scan-clear" id="scanClearBtn">Bersihkan log</button>
+          </div>
+          <div class="scan-log-wrap">
+            <table class="scan-log-table" id="scanLogTable">
+              <thead>
+                <tr><th>#</th><th>No CTN</th><th>SKU</th><th>Qty</th><th></th></tr>
+              </thead>
+              <tbody id="scanLogBody"></tbody>
+            </table>
+            <div class="scan-log-empty" id="scanLogEmpty">Belum ada data yang discan.</div>
+          </div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <div class="card gsheet-card">
+    <div class="card-head">
+      <h2>Keep Stock — Sumber Google Sheet</h2>
+      <span class="tag gsheet">Opsional</span>
+    </div>
+    <div class="card-body">
+      <div class="gsheet-row">
+        <input type="text" id="gsheetUrl" placeholder="Tempel link Google Sheet (kolom C = SKU, kolom G = Qty Keep Stock)">
+        <button type="button" class="gsheet-load" id="gsheetLoadBtn">Coba Muat Otomatis</button>
+      </div>
+      <div class="gsheet-generated" id="gsheetGenerated" style="display:none;">
+        Link CSV langsung: <a href="#" id="gsheetGeneratedLink" target="_blank" rel="noopener"></a>
+        <button type="button" class="gsheet-copy" id="gsheetCopyBtn">Salin Link</button>
+      </div>
+      <div class="gsheet-status" id="gsheetStatus">Belum ada data keep stock dimuat. Selisih dihitung dari Qty Scan saja.</div>
+      <div class="gsheet-note">Catatan: memuat langsung dari link sering diblokir oleh keamanan browser (bukan soal izin sheet). Kalau muncul "NetworkError" / gagal, klik link CSV di atas untuk buka/download-nya, lalu upload atau tempel isinya di kotak manual di bawah — hasilnya identik.</div>
+
+      <div class="gsheet-divider"><span>atau tempel/upload CSV secara manual</span></div>
+
+      <textarea id="gsheetCsv" class="gsheet-textarea" placeholder="Buka Google Sheet → File → Download → Comma Separated Values (.csv), lalu buka file itu dengan text editor dan tempel isinya di sini. Atau upload langsung file .csv-nya."></textarea>
+      <div class="filerow">
+        <input type="file" id="gsheetFile" accept=".csv,.txt">
+        <span class="meta" id="gsheetFileMeta">Belum ada file</span>
+      </div>
+      <button type="button" class="gsheet-load" id="gsheetParseBtn" style="margin-top:10px;">Proses Keep Stock dari Teks/CSV Ini</button>
     </div>
   </div>
 
@@ -562,8 +900,123 @@ function readFileInto(inputEl, textareaEl, metaEl){
     });
   });
 }
+// ---- Display mode: PC / HP ----
+const viewDesktopBtn = document.getElementById('viewDesktopBtn');
+const viewMobileBtn = document.getElementById('viewMobileBtn');
+let viewModeOverridden = false;
+
+function setViewMode(isMobile){
+  document.documentElement.classList.toggle('force-mobile', isMobile);
+  viewDesktopBtn.classList.toggle('active', !isMobile);
+  viewMobileBtn.classList.toggle('active', isMobile);
+}
+
+viewDesktopBtn.addEventListener('click', ()=>{ viewModeOverridden = true; setViewMode(false); });
+viewMobileBtn.addEventListener('click', ()=>{ viewModeOverridden = true; setViewMode(true); });
+
+const mobileMql = window.matchMedia('(max-width: 720px)');
+function autoApplyViewMode(){
+  if(viewModeOverridden) return;
+  setViewMode(mobileMql.matches);
+}
+autoApplyViewMode();
+mobileMql.addEventListener ? mobileMql.addEventListener('change', autoApplyViewMode) : mobileMql.addListener(autoApplyViewMode);
+
 readFileInto(document.getElementById('file1'), document.getElementById('data1'), document.getElementById('meta1'));
 readFileInto(document.getElementById('file2'), document.getElementById('data2'), document.getElementById('meta2'));
+
+// ---- Scan mode toggle ----
+const modeUploadBtn = document.getElementById('modeUploadBtn');
+const modeScanBtn = document.getElementById('modeScanBtn');
+const panelUpload = document.getElementById('panelUpload');
+const panelScan = document.getElementById('panelScan');
+
+modeUploadBtn.addEventListener('click', ()=>{
+  modeUploadBtn.classList.add('active');
+  modeScanBtn.classList.remove('active');
+  panelUpload.style.display = '';
+  panelScan.style.display = 'none';
+});
+modeScanBtn.addEventListener('click', ()=>{
+  modeScanBtn.classList.add('active');
+  modeUploadBtn.classList.remove('active');
+  panelUpload.style.display = 'none';
+  panelScan.style.display = '';
+  document.getElementById('scanCtn').focus();
+});
+
+// ---- Live scan entry (No CTN, SKU, Qty) ----
+let scanLog = []; // {ctn, sku, qty}
+const scanCtnEl = document.getElementById('scanCtn');
+const scanSkuEl = document.getElementById('scanSku');
+const scanQtyEl = document.getElementById('scanQty');
+const scanLogBody = document.getElementById('scanLogBody');
+const scanLogEmpty = document.getElementById('scanLogEmpty');
+const scanCountEl = document.getElementById('scanCount');
+const data2Textarea = document.getElementById('data2');
+
+function renderScanLog(){
+  scanLogBody.innerHTML = scanLog.map((e,i)=>`
+    <tr>
+      <td>${i+1}</td>
+      <td>${e.ctn || '-'}</td>
+      <td>${e.sku}</td>
+      <td>${e.qty}</td>
+      <td><button type="button" class="scan-log-del" data-idx="${i}">Hapus</button></td>
+    </tr>`).join('');
+  scanLogEmpty.style.display = scanLog.length ? 'none' : 'block';
+  scanCountEl.textContent = `${scanLog.length} baris discan`;
+}
+
+function syncScanLogToTextarea(){
+  // Feed scanned rows into the same data2 textarea as SKU,Qty lines so the
+  // exact same parsing/comparison/print logic used for uploaded files applies.
+  data2Textarea.value = scanLog.map(e => `${e.sku},${e.qty}`).join('\n');
+}
+
+function addScanEntry(){
+  const ctn = scanCtnEl.value.trim();
+  const sku = scanSkuEl.value.trim();
+  const qty = parseFloat(scanQtyEl.value) || 0;
+  if(!sku){
+    scanSkuEl.focus();
+    return;
+  }
+  scanLog.push({ctn, sku, qty});
+  renderScanLog();
+  syncScanLogToTextarea();
+
+  scanCtnEl.value = '';
+  scanSkuEl.value = '';
+  scanQtyEl.value = '1';
+  scanCtnEl.focus();
+}
+
+scanCtnEl.addEventListener('keydown', e=>{
+  if(e.key === 'Enter'){ e.preventDefault(); scanSkuEl.focus(); scanSkuEl.select(); }
+});
+scanSkuEl.addEventListener('keydown', e=>{
+  if(e.key === 'Enter'){ e.preventDefault(); scanQtyEl.focus(); scanQtyEl.select(); }
+});
+scanQtyEl.addEventListener('keydown', e=>{
+  if(e.key === 'Enter'){ e.preventDefault(); addScanEntry(); }
+});
+document.getElementById('scanAddBtn').addEventListener('click', addScanEntry);
+
+document.getElementById('scanClearBtn').addEventListener('click', ()=>{
+  scanLog = [];
+  renderScanLog();
+  syncScanLogToTextarea();
+});
+
+scanLogBody.addEventListener('click', e=>{
+  const btn = e.target.closest('.scan-log-del');
+  if(!btn) return;
+  const idx = parseInt(btn.dataset.idx, 10);
+  scanLog.splice(idx, 1);
+  renderScanLog();
+  syncScanLogToTextarea();
+});
 
 document.getElementById('clearBtn').addEventListener('click', ()=>{
   document.getElementById('data1').value='';
@@ -573,6 +1026,10 @@ document.getElementById('clearBtn').addEventListener('click', ()=>{
   document.getElementById('errMsg').textContent='';
   document.getElementById('summaryWrap').innerHTML='';
   document.getElementById('results').innerHTML='<div class="empty">Belum ada hasil. Isi kedua data lalu klik "Jalankan Perbandingan".</div>';
+  if(typeof scanLog !== 'undefined'){
+    scanLog = [];
+    renderScanLog();
+  }
 });
 
 // Global store of the last computed comparison, grouped by address.
@@ -594,6 +1051,172 @@ function aggregateScanBySku(items){
 }
 
 let lastUnresolvedSkuOnly = []; // sku-only scan rows whose SKU wasn't found anywhere in the system
+
+// ---- Keep Stock from Google Sheet ----
+let keepStockMap = null;    // Map: sku -> numeric qty, or null if not loaded
+let keepStockLoaded = false;
+
+function parseGSheetUrl(url){
+  const idMatch = url.match(/\/d\/([a-zA-Z0-9-_]+)/);
+  if(!idMatch) return null;
+  const gidMatch = url.match(/[?&#]gid=(\d+)/);
+  return { id: idMatch[1], gid: gidMatch ? gidMatch[1] : '0' };
+}
+
+// Minimal CSV line parser that handles quoted fields containing commas.
+function parseCsvLine(line){
+  const out = [];
+  let cur = '';
+  let inQuotes = false;
+  for(let i=0;i<line.length;i++){
+    const ch = line[i];
+    if(inQuotes){
+      if(ch === '"'){
+        if(line[i+1] === '"'){ cur += '"'; i++; }
+        else inQuotes = false;
+      } else cur += ch;
+    } else {
+      if(ch === '"') inQuotes = true;
+      else if(ch === ','){ out.push(cur); cur=''; }
+      else cur += ch;
+    }
+  }
+  out.push(cur);
+  return out;
+}
+
+async function loadKeepStockFromSheet(){
+  const statusEl = document.getElementById('gsheetStatus');
+  const url = document.getElementById('gsheetUrl').value.trim();
+
+  if(!url){
+    statusEl.className = 'gsheet-status err';
+    statusEl.textContent = 'Tempel link Google Sheet terlebih dahulu.';
+    return;
+  }
+
+  const parsed = parseGSheetUrl(url);
+  if(!parsed){
+    statusEl.className = 'gsheet-status err';
+    statusEl.textContent = 'Link Google Sheet tidak valid.';
+    return;
+  }
+
+  statusEl.className = 'gsheet-status';
+  statusEl.textContent = 'Memuat data dari Google Sheet...';
+
+  const exportUrl = `https://docs.google.com/spreadsheets/d/${parsed.id}/gviz/tq?tqx=out:csv&gid=${parsed.gid}`;
+
+  try{
+    const res = await fetch(exportUrl);
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    const text = await res.text();
+
+    if(/^\s*<(!DOCTYPE|html)/i.test(text)){
+      throw new Error('sheet tidak bisa diakses publik (butuh akses "Anyone with the link").');
+    }
+
+    applyKeepStockCsv(text, 'Google Sheet');
+  } catch(err){
+    statusEl.className = 'gsheet-status err';
+    statusEl.textContent = `Gagal memuat otomatis (${err.message}). Browser sering memblokir akses langsung ke Google Sheets — pakai cara tempel/upload CSV manual di bawah, hasilnya sama.`;
+  }
+}
+
+document.getElementById('gsheetLoadBtn').addEventListener('click', loadKeepStockFromSheet);
+
+// Live-generate the direct CSV export link whenever the original sheet link changes.
+const gsheetUrlEl = document.getElementById('gsheetUrl');
+const gsheetGeneratedEl = document.getElementById('gsheetGenerated');
+const gsheetGeneratedLinkEl = document.getElementById('gsheetGeneratedLink');
+
+function updateGeneratedLink(){
+  const url = gsheetUrlEl.value.trim();
+  const parsed = url ? parseGSheetUrl(url) : null;
+  if(!parsed){
+    gsheetGeneratedEl.style.display = 'none';
+    return;
+  }
+  const exportUrl = `https://docs.google.com/spreadsheets/d/${parsed.id}/gviz/tq?tqx=out:csv&gid=${parsed.gid}`;
+  gsheetGeneratedLinkEl.href = exportUrl;
+  gsheetGeneratedLinkEl.textContent = exportUrl;
+  gsheetGeneratedEl.style.display = 'flex';
+}
+
+gsheetUrlEl.addEventListener('input', updateGeneratedLink);
+gsheetUrlEl.addEventListener('paste', ()=> setTimeout(updateGeneratedLink, 0));
+
+document.getElementById('gsheetCopyBtn').addEventListener('click', ()=>{
+  const href = gsheetGeneratedLinkEl.href;
+  const btn = document.getElementById('gsheetCopyBtn');
+  navigator.clipboard.writeText(href).then(()=>{
+    const original = btn.textContent;
+    btn.textContent = 'Tersalin!';
+    setTimeout(()=>{ btn.textContent = original; }, 1500);
+  }).catch(()=>{
+    btn.textContent = 'Gagal menyalin';
+  });
+});
+
+// Shared: parse CSV text (col C = SKU, col G = Qty) into keepStockMap.
+function applyKeepStockCsv(text, sourceLabel){
+  const statusEl = document.getElementById('gsheetStatus');
+  const lines = text.split(/\r?\n/).filter(l=>l.trim().length>0);
+  const map = new Map();
+  let count = 0;
+
+  lines.forEach(line=>{
+    const cols = parseCsvLine(line);
+    const sku = (cols[2]||'').trim();    // column C
+    const qtyRaw = (cols[6]||'').trim(); // column G
+    if(!sku || !/^\d+$/.test(sku)) return; // skip header/non-numeric SKU rows
+    const qty = parseFloat(qtyRaw) || 0;
+    map.set(sku, qty);
+    count++;
+  });
+
+  if(count === 0){
+    statusEl.className = 'gsheet-status err';
+    statusEl.textContent = 'Tidak ada data SKU numerik ditemukan di kolom C pada teks/CSV ini.';
+    return;
+  }
+
+  keepStockMap = map;
+  keepStockLoaded = true;
+  statusEl.className = 'gsheet-status ok';
+  statusEl.textContent = `${count} SKU keep stock dimuat dari ${sourceLabel}. Perbandingan akan memakai (Qty Scan + Keep Stock) − Qty Sistem.`;
+}
+
+document.getElementById('gsheetParseBtn').addEventListener('click', ()=>{
+  const text = document.getElementById('gsheetCsv').value;
+  if(!text.trim()){
+    const statusEl = document.getElementById('gsheetStatus');
+    statusEl.className = 'gsheet-status err';
+    statusEl.textContent = 'Tempel teks CSV atau upload file terlebih dahulu.';
+    return;
+  }
+  applyKeepStockCsv(text, 'teks/CSV manual');
+});
+
+document.getElementById('gsheetFile').addEventListener('change', ()=>{
+  const f = document.getElementById('gsheetFile').files[0];
+  if(!f) return;
+  const reader = new FileReader();
+  reader.onload = e=>{
+    document.getElementById('gsheetCsv').value = e.target.result;
+    document.getElementById('gsheetFileMeta').textContent = f.name + ' · ' + (f.size/1024).toFixed(1) + ' KB dimuat';
+    applyKeepStockCsv(e.target.result, f.name);
+  };
+  reader.onerror = ()=>{
+    document.getElementById('gsheetFileMeta').textContent = 'Gagal membaca file.';
+  };
+  reader.readAsText(f);
+});
+
+function getKeepStock(sku){
+  if(keepStockLoaded && keepStockMap && keepStockMap.has(sku)) return keepStockMap.get(sku);
+  return 0;
+}
 
 function computeGroups(d1, itemsWithAddr, itemsSkuOnly){
   const g1 = groupBy(d1, 'addr');
@@ -638,26 +1261,38 @@ function computeGroups(d1, itemsWithAddr, itemsSkuOnly){
       const scanned = scanMap.get(item.sku);
       if(item.qty === 0 && !scanned) return; // skip zero-qty system SKUs that weren't scanned
 
+      const ks = getKeepStock(item.sku);
+
       if(!scanned){
         rows.push({
           addr, sku:item.sku, desc:item.desc, qtySys:item.qty, qtyScan:null,
           selisih:null, status:'notscan',
           remark:`SKU ada di sistem untuk alamat ${addr} tapi tidak ditemukan di data scan.`,
-          skuLen: item.sku.length, scanOrder: Infinity, keepStock: item.keepStock
-        });
-      } else if(scanned.qty === item.qty){
-        rows.push({
-          addr, sku:item.sku, desc:item.desc, qtySys:item.qty, qtyScan:scanned.qty,
-          selisih:0, status:'ok', remark:'', skuLen: item.sku.length, scanOrder: scanned.order, keepStock: item.keepStock
+          skuLen: item.sku.length, scanOrder: Infinity,
+          keepStock: keepStockLoaded ? ks : item.keepStock
         });
       } else {
-        const selisih = scanned.qty - item.qty;
-        rows.push({
-          addr, sku:item.sku, desc:item.desc, qtySys:item.qty, qtyScan:scanned.qty,
-          selisih, status:'diff',
-          remark:`Scan ${selisih>0?'+':''}${selisih} dari sistem (${selisih>0?'lebih':'kurang'} ${Math.abs(selisih)}).`,
-          skuLen: item.sku.length, scanOrder: scanned.order, keepStock: item.keepStock
-        });
+        const effectiveScan = scanned.qty + (keepStockLoaded ? ks : 0);
+        const selisih = effectiveScan - item.qty;
+        if(selisih === 0){
+          rows.push({
+            addr, sku:item.sku, desc:item.desc, qtySys:item.qty, qtyScan:scanned.qty,
+            selisih:0, status:'ok',
+            remark: keepStockLoaded && ks!==0 ? `Sesuai: qty scan ${scanned.qty} + keep stock ${ks} = ${effectiveScan} (sistem ${item.qty}).` : '',
+            skuLen: item.sku.length, scanOrder: scanned.order,
+            keepStock: keepStockLoaded ? ks : item.keepStock
+          });
+        } else {
+          rows.push({
+            addr, sku:item.sku, desc:item.desc, qtySys:item.qty, qtyScan:scanned.qty,
+            selisih, status:'diff',
+            remark: keepStockLoaded
+              ? `Qty scan ${scanned.qty} + keep stock ${ks} = ${effectiveScan}, selisih ${selisih>0?'+':''}${selisih} dari sistem (${item.qty}).`
+              : `Scan ${selisih>0?'+':''}${selisih} dari sistem (${selisih>0?'lebih':'kurang'} ${Math.abs(selisih)}).`,
+            skuLen: item.sku.length, scanOrder: scanned.order,
+            keepStock: keepStockLoaded ? ks : item.keepStock
+          });
+        }
       }
     });
 
@@ -667,12 +1302,15 @@ function computeGroups(d1, itemsWithAddr, itemsSkuOnly){
         if(sysItemElsewhere && sysItemElsewhere.addr !== addr){
           // SKU exists in the system, just under a different address —
           // flag it so the user can correct the scanned address.
-          const selisih = s.qty - sysItemElsewhere.qty;
+          const ksW = getKeepStock(s.sku);
+          const effectiveScanW = s.qty + (keepStockLoaded ? ksW : 0);
+          const selisih = effectiveScanW - sysItemElsewhere.qty;
           rows.push({
             addr, sku:s.sku, desc:sysItemElsewhere.desc, qtySys:sysItemElsewhere.qty, qtyScan:s.qty,
             selisih, status:'wrongaddr',
             remark:`SKU terdaftar di alamat ${sysItemElsewhere.addr} pada sistem, bukan di ${addr}. Mohon revisi alamat scan.`,
-            skuLen: s.sku.length, scanOrder: s.order, keepStock: sysItemElsewhere.keepStock,
+            skuLen: s.sku.length, scanOrder: s.order,
+            keepStock: keepStockLoaded ? ksW : sysItemElsewhere.keepStock,
             actualAddr: sysItemElsewhere.addr
           });
         } else {
@@ -707,17 +1345,23 @@ function computeGroups(d1, itemsWithAddr, itemsSkuOnly){
     const entries = Array.from(summed.values());
     const rows = entries.map(r=>{
       const item = r.sysItem;
-      if(r.qtyScan === item.qty){
+      const ks = getKeepStock(item.sku);
+      const effectiveScan = r.qtyScan + (keepStockLoaded ? ks : 0);
+      const selisih = effectiveScan - item.qty;
+      if(selisih === 0){
         return {addr, sku:item.sku, desc:item.desc, qtySys:item.qty, qtyScan:r.qtyScan,
           selisih:0, status:'ok',
-          remark:'Dari data scan SKU+Qty (tanpa alamat) — alamat diambil dari sistem.',
-          skuLen: item.sku.length, scanOrder: r.order, keepStock: item.keepStock};
+          remark: keepStockLoaded && ks!==0
+            ? `Sesuai: qty scan ${r.qtyScan} + keep stock ${ks} = ${effectiveScan} (sistem ${item.qty}). Dari data scan SKU+Qty (tanpa alamat).`
+            : 'Dari data scan SKU+Qty (tanpa alamat) — alamat diambil dari sistem.',
+          skuLen: item.sku.length, scanOrder: r.order, keepStock: keepStockLoaded ? ks : item.keepStock};
       }
-      const selisih = r.qtyScan - item.qty;
       return {addr, sku:item.sku, desc:item.desc, qtySys:item.qty, qtyScan:r.qtyScan,
         selisih, status:'diff',
-        remark:`Scan ${selisih>0?'+':''}${selisih} dari sistem (${selisih>0?'lebih':'kurang'} ${Math.abs(selisih)}). Dari data scan SKU+Qty (tanpa alamat) — alamat diambil dari sistem.`,
-        skuLen: item.sku.length, scanOrder: r.order, keepStock: item.keepStock};
+        remark: keepStockLoaded
+          ? `Qty scan ${r.qtyScan} + keep stock ${ks} = ${effectiveScan}, selisih ${selisih>0?'+':''}${selisih} dari sistem (${item.qty}). Dari data scan SKU+Qty (tanpa alamat).`
+          : `Scan ${selisih>0?'+':''}${selisih} dari sistem (${selisih>0?'lebih':'kurang'} ${Math.abs(selisih)}). Dari data scan SKU+Qty (tanpa alamat) — alamat diambil dari sistem.`,
+        skuLen: item.sku.length, scanOrder: r.order, keepStock: keepStockLoaded ? ks : item.keepStock};
     });
     groups.push({addr, sysCount: rows.length, scanCount: entries.length, rows, partial:true});
   });
