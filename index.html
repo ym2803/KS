@@ -151,7 +151,7 @@
 
   .summary{
     display:grid;
-    grid-template-columns:repeat(5,1fr);
+    grid-template-columns:repeat(6,1fr);
     gap:1px;
     background:var(--ink);
     border:1px solid var(--ink);
@@ -168,6 +168,7 @@
   .stat.notscan .num{color:var(--red)}
   .stat.diffqty .num{color:var(--amber)}
   .stat.extra .num{color:var(--blue)}
+  .stat.wrongaddr .num{color:#7a3aad}
 
   .group{
     border:1px solid var(--ink);
@@ -227,10 +228,12 @@
   .status.notscan{background:var(--red-soft);color:var(--red);border-color:var(--red);}
   .status.diff{background:var(--amber-soft);color:var(--amber);border-color:var(--amber);}
   .status.extra{background:#e2ecf5;color:var(--blue);border-color:var(--blue);}
+  .status.wrongaddr{background:#f3e7fb;color:#7a3aad;border-color:#7a3aad;}
   .remark{font-size:11.5px;color:#4a5259;margin-top:3px;}
   tr.row-notscan{background:#fff9f8;}
   tr.row-diff{background:#fffaf2;}
   tr.row-extra{background:#f5f9fc;}
+  tr.row-wrongaddr{background:#faf5fd;}
 
   .empty{
     padding:40px;
@@ -660,12 +663,26 @@ function computeGroups(d1, itemsWithAddr, itemsSkuOnly){
 
     scanItems.forEach(s=>{
       if(!sysSkuSet.has(s.sku)){
-        rows.push({
-          addr, sku:s.sku, desc:'', qtySys:null, qtyScan:s.qty,
-          selisih:null, status:'extra',
-          remark:`SKU muncul di data scan untuk alamat ${addr} tapi tidak ada di data sistem.`,
-          skuLen: s.sku.length, scanOrder: s.order, keepStock: ''
-        });
+        const sysItemElsewhere = skuToSysItem.get(s.sku);
+        if(sysItemElsewhere && sysItemElsewhere.addr !== addr){
+          // SKU exists in the system, just under a different address —
+          // flag it so the user can correct the scanned address.
+          const selisih = s.qty - sysItemElsewhere.qty;
+          rows.push({
+            addr, sku:s.sku, desc:sysItemElsewhere.desc, qtySys:sysItemElsewhere.qty, qtyScan:s.qty,
+            selisih, status:'wrongaddr',
+            remark:`SKU terdaftar di alamat ${sysItemElsewhere.addr} pada sistem, bukan di ${addr}. Mohon revisi alamat scan.`,
+            skuLen: s.sku.length, scanOrder: s.order, keepStock: sysItemElsewhere.keepStock,
+            actualAddr: sysItemElsewhere.addr
+          });
+        } else {
+          rows.push({
+            addr, sku:s.sku, desc:'', qtySys:null, qtyScan:s.qty,
+            selisih:null, status:'extra',
+            remark:`SKU muncul di data scan untuk alamat ${addr} tapi tidak ada di data sistem.`,
+            skuLen: s.sku.length, scanOrder: s.order, keepStock: ''
+          });
+        }
       }
     });
 
@@ -717,7 +734,7 @@ function skuPasses(row, showLebih){
 function renderResults(){
   const showLebih = document.getElementById('filterLebih').checked;
 
-  let totalSku=0, totalMatch=0, totalNotScan=0, totalDiff=0, totalExtra=0;
+  let totalSku=0, totalMatch=0, totalNotScan=0, totalDiff=0, totalExtra=0, totalWrongAddr=0;
   let groupsHtml = '';
 
   lastGroups.forEach(g=>{
@@ -786,6 +803,22 @@ function renderResults(){
               <div class="remark">${r.remark}</div>
             </td>
           </tr>`;
+      } else if(r.status==='wrongaddr'){
+        totalWrongAddr++;
+        const sign = r.selisih>0?'+':'';
+        rowsHtml += `
+          <tr class="row-wrongaddr">
+            <td class="sku">${r.sku}</td>
+            <td class="desc">${r.desc||'-'}</td>
+            <td class="qty">${r.qtySys}</td>
+            <td class="qty">${r.qtyScan}</td>
+            <td class="desc">${r.keepStock||'-'}</td>
+            <td class="qty">${sign}${r.selisih}</td>
+            <td>
+              <span class="status wrongaddr">Alamat Tidak Sesuai</span>
+              <div class="remark">${r.remark}</div>
+            </td>
+          </tr>`;
       }
     });
 
@@ -820,6 +853,7 @@ function renderResults(){
       <div class="stat match"><div class="num">${totalMatch}</div><div class="lbl">Sesuai</div></div>
       <div class="stat notscan"><div class="num">${totalNotScan}</div><div class="lbl">Belum Discan</div></div>
       <div class="stat diffqty"><div class="num">${totalDiff}</div><div class="lbl">Selisih Qty</div></div>
+      <div class="stat wrongaddr"><div class="num">${totalWrongAddr}</div><div class="lbl">Alamat Tidak Sesuai</div></div>
       <div class="stat extra"><div class="num">${totalExtra}</div><div class="lbl">Tidak Terdaftar</div></div>
     </div>`;
 
@@ -881,7 +915,7 @@ function buildPrintArea(mode){
   });
 
   const statusLabel = {
-    ok:'Sesuai', notscan:'Belum Discan', diff:'Selisih Qty', extra:'Tidak Terdaftar'
+    ok:'Sesuai', notscan:'Belum Discan', diff:'Selisih Qty', extra:'Tidak Terdaftar', wrongaddr:'Alamat Tidak Sesuai'
   };
 
   const title = mode==='notscan' ? 'Laporan SKU Belum Discan' : 'Laporan Perbandingan Stok — Semua Data';
@@ -894,7 +928,7 @@ function buildPrintArea(mode){
     rowsHtml += `
       <tr>
         <td class="num">${seq}</td>
-        <td>${r.addr}</td>
+        <td>${r.status==='wrongaddr' ? `${r.addr}→${r.actualAddr}` : r.addr}</td>
         <td>${r.sku}</td>
         <td>${(r.desc||'-').substring(0,20)}</td>
         <td class="num">${r.qtySys ?? '—'}</td>
