@@ -1,20 +1,938 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>KEEP STOCK</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body { width: 100%; height: 100%; overflow: hidden; background: #f4f6f8; }
-    iframe { width: 100%; height: 100vh; border: none; }
-  </style>
+<meta charset="UTF-8">
+<title>Stock Opname — Compare Sistem vs Scan</title>
+<style>
+  :root{
+    --ink:#12181f;
+    --paper:#eef1f0;
+    --panel:#ffffff;
+    --line:#d8ddd9;
+    --amber:#c9821a;
+    --amber-soft:#fbeed9;
+    --green:#2f7a4d;
+    --green-soft:#e4f3e9;
+    --red:#b0392c;
+    --red-soft:#fbe6e2;
+    --blue:#2b5a8a;
+    --mono: 'JetBrains Mono','SFMono-Regular',Consolas,monospace;
+    --sans: 'Inter','Segoe UI',sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    background:var(--paper);
+    font-family:var(--sans);
+    color:var(--ink);
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 32px 32px;
+    background-position: -1px -1px;
+  }
+  header{
+    padding:28px 32px 18px;
+    border-bottom:2px solid var(--ink);
+    background:var(--paper);
+  }
+  .eyebrow{
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--amber);
+    margin-bottom:6px;
+  }
+  h1{
+    margin:0;
+    font-size:26px;
+    font-weight:700;
+    letter-spacing:-.01em;
+  }
+  .sub{
+    margin-top:6px;
+    font-size:13.5px;
+    color:#4a5259;
+    max-width:640px;
+    line-height:1.5;
+  }
+  main{max-width:1180px;margin:0 auto;padding:26px 32px 80px;}
+
+  .inputs{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:18px;
+    margin-bottom:20px;
+  }
+  .card{
+    background:var(--panel);
+    border:1px solid var(--ink);
+    box-shadow:4px 4px 0 var(--ink);
+  }
+  .card-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:12px 16px;
+    border-bottom:1px solid var(--line);
+  }
+  .card-head .tag{
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    padding:3px 8px;
+    border:1px solid var(--ink);
+  }
+  .tag.sys{background:var(--blue);color:#fff;border-color:var(--blue)}
+  .tag.scan{background:var(--amber);color:#fff;border-color:var(--amber)}
+  .card-head h2{font-size:14px;margin:0;font-weight:600}
+  .card-body{padding:14px 16px;}
+  textarea{
+    width:100%;
+    min-height:150px;
+    resize:vertical;
+    font-family:var(--mono);
+    font-size:12px;
+    line-height:1.5;
+    border:1px solid var(--line);
+    padding:10px;
+    background:#fbfbfa;
+    color:var(--ink);
+  }
+  textarea:focus{outline:2px solid var(--ink);outline-offset:1px;}
+  .filerow{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-top:10px;
+    font-size:12px;
+    color:#4a5259;
+  }
+  input[type=file]{font-size:12px;font-family:var(--sans);}
+  .meta{font-family:var(--mono);font-size:11px;color:#4a5259;margin-top:6px;}
+
+  .runbar{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    margin:22px 0 26px;
+  }
+  button.run{
+    font-family:var(--mono);
+    font-size:13px;
+    letter-spacing:.05em;
+    text-transform:uppercase;
+    background:var(--ink);
+    color:#fff;
+    border:none;
+    padding:12px 22px;
+    cursor:pointer;
+    box-shadow:4px 4px 0 var(--amber);
+    transition:transform .08s ease;
+  }
+  button.run:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--amber);}
+  button.run:active{transform:translate(0,0);box-shadow:2px 2px 0 var(--amber);}
+  button.clear{
+    font-family:var(--mono);
+    font-size:12px;
+    background:transparent;
+    border:1px solid var(--ink);
+    padding:11px 16px;
+    cursor:pointer;
+  }
+  .err{
+    font-family:var(--mono);
+    font-size:12px;
+    color:var(--red);
+    margin-left:auto;
+  }
+
+  .summary{
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:1px;
+    background:var(--ink);
+    border:1px solid var(--ink);
+    margin-bottom:28px;
+  }
+  .stat{
+    background:var(--panel);
+    padding:16px 14px;
+  }
+  .stat .num{font-family:var(--mono);font-size:26px;font-weight:700;line-height:1;}
+  .stat .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#4a5259;margin-top:6px;}
+  .stat.total .num{color:var(--ink)}
+  .stat.match .num{color:var(--green)}
+  .stat.notscan .num{color:var(--red)}
+  .stat.diffqty .num{color:var(--amber)}
+  .stat.extra .num{color:var(--blue)}
+
+  .group{
+    border:1px solid var(--ink);
+    margin-bottom:18px;
+    background:var(--panel);
+  }
+  .group-head{
+    display:flex;
+    align-items:baseline;
+    gap:12px;
+    padding:10px 16px;
+    background:var(--ink);
+    color:#fff;
+  }
+  .group-head .addr{
+    font-family:var(--mono);
+    font-weight:700;
+    font-size:14px;
+  }
+  .group-head .counts{
+    font-family:var(--mono);
+    font-size:11px;
+    color:#cfd6da;
+    margin-left:auto;
+  }
+  table{width:100%;border-collapse:collapse;font-size:12.5px;}
+  thead th{
+    text-align:left;
+    font-family:var(--mono);
+    font-size:10.5px;
+    text-transform:uppercase;
+    letter-spacing:.05em;
+    color:#4a5259;
+    padding:8px 12px;
+    border-bottom:1px solid var(--line);
+    background:#f5f6f4;
+  }
+  tbody td{
+    padding:8px 12px;
+    border-bottom:1px solid var(--line);
+    vertical-align:top;
+  }
+  tbody tr:last-child td{border-bottom:none;}
+  .sku{font-family:var(--mono);font-weight:600;}
+  .desc{color:#4a5259;font-size:11.5px;}
+  .qty{font-family:var(--mono);text-align:right;}
+  .status{
+    font-family:var(--mono);
+    font-size:10.5px;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+    padding:3px 8px;
+    display:inline-block;
+    border:1px solid transparent;
+  }
+  .status.ok{background:var(--green-soft);color:var(--green);border-color:var(--green);}
+  .status.notscan{background:var(--red-soft);color:var(--red);border-color:var(--red);}
+  .status.diff{background:var(--amber-soft);color:var(--amber);border-color:var(--amber);}
+  .status.extra{background:#e2ecf5;color:var(--blue);border-color:var(--blue);}
+  .remark{font-size:11.5px;color:#4a5259;margin-top:3px;}
+  tr.row-notscan{background:#fff9f8;}
+  tr.row-diff{background:#fffaf2;}
+  tr.row-extra{background:#f5f9fc;}
+
+  .empty{
+    padding:40px;
+    text-align:center;
+    font-family:var(--mono);
+    font-size:12.5px;
+    color:#8a9096;
+    border:1px dashed var(--line);
+  }
+  footer{
+    max-width:1180px;margin:0 auto;padding:0 32px 40px;
+    font-family:var(--mono);font-size:10.5px;color:#8a9096;
+  }
+
+  .toolbar{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:18px;
+    margin:0 0 22px;
+    padding:14px 16px;
+    border:1px solid var(--ink);
+    background:var(--panel);
+  }
+  .toolbar-group{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:12.5px;
+  }
+  .toolbar-group .divider{
+    width:1px;height:20px;background:var(--line);
+  }
+  .chk{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    font-family:var(--mono);
+    font-size:12px;
+    cursor:pointer;
+    user-select:none;
+  }
+  .chk input{width:15px;height:15px;accent-color:var(--ink);cursor:pointer;}
+  select.printmode{
+    font-family:var(--mono);
+    font-size:12px;
+    padding:7px 10px;
+    border:1px solid var(--ink);
+    background:#fbfbfa;
+    color:var(--ink);
+  }
+  button.printbtn{
+    font-family:var(--mono);
+    font-size:12px;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+    background:var(--blue);
+    color:#fff;
+    border:none;
+    padding:9px 16px;
+    cursor:pointer;
+    box-shadow:3px 3px 0 var(--ink);
+  }
+  button.printbtn:hover{transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--ink);}
+
+  #printArea{display:none;}
+
+  @media print{
+    body{background:#fff;}
+    body > *:not(#printArea){display:none !important;}
+    #printArea{
+      display:block !important;
+      font-family:var(--mono);
+      color:#000;
+    }
+    #printArea .p-title{
+      font-size:13px;font-weight:700;margin-bottom:2px;
+    }
+    #printArea .p-sub{
+      font-size:9px;color:#333;margin-bottom:8px;
+    }
+    #printArea table{
+      width:100%;
+      border-collapse:collapse;
+      font-size:8px;
+      table-layout:fixed;
+    }
+    #printArea th, #printArea td{
+      border:0.5px solid #999;
+      padding:2px 4px;
+      text-align:left;
+      overflow:hidden;
+      white-space:nowrap;
+      text-overflow:ellipsis;
+    }
+    #printArea th{
+      background:#eee;
+      font-weight:700;
+      text-transform:uppercase;
+      font-size:7.5px;
+    }
+    #printArea td.num, #printArea th.num{text-align:right;}
+    #printArea tr{break-inside:avoid;}
+    @page{ size:A4 portrait; margin:10mm 8mm; }
+  }
+</style>
 </head>
 <body>
-  <!-- GANTI URL DI BAWAH INI DENGAN URL WEB APP ANDA -->
-  <iframe src="https://script.google.com/macros/s/AKfycbzelYxXDX1O661y58xwAm1bihq88R99TZcekUlmXhZ6uRA5RZV94H97POjkTesZb8Sr/exec" 
-          allow="fullscreen" 
-          loading="eager">
-  </iframe>
+
+<header>
+  <div class="eyebrow">Stock Opname · Ledger Audit</div>
+  <h1>Compare Sistem vs Scan</h1>
+  <div class="sub">Tempel atau unggah data sistem (data 1) dan data hasil scan (data 2) berformat .txt. Aplikasi akan mencocokkan tiap SKU per alamat, menandai SKU yang belum discan, dan menghitung selisih qty.</div>
+</header>
+
+<main>
+  <div class="inputs">
+    <div class="card">
+      <div class="card-head">
+        <h2>Data Sistem</h2>
+        <span class="tag sys">Data 1</span>
+      </div>
+      <div class="card-body">
+        <textarea id="data1" placeholder="2002020,AG13-02,20000.00,BLIND BOX...,...,3,...&#10;2002021,AG13-02,...,3&#10;..."></textarea>
+        <div class="filerow">
+          <input type="file" id="file1" accept=".txt,.csv" multiple>
+          <span class="meta" id="meta1">Belum ada file</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h2>Data Scan</h2>
+        <span class="tag scan">Data 2</span>
+      </div>
+      <div class="card-body">
+        <textarea id="data2" placeholder="AG13-02,2002020,3&#10;AG13-02,2002022,4&#10;..."></textarea>
+        <div class="filerow">
+          <input type="file" id="file2" accept=".txt,.csv" multiple>
+          <span class="meta" id="meta2">Belum ada file</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="runbar">
+    <button class="run" id="runBtn">Jalankan Perbandingan</button>
+    <button class="clear" id="clearBtn">Bersihkan</button>
+    <span class="err" id="errMsg"></span>
+  </div>
+
+  <div class="toolbar" id="toolbar" style="display:none;">
+    <div class="toolbar-group">
+      <label class="chk">
+        <input type="checkbox" id="filterLebih">
+        Tampilkan SKU lebih dari 7 digit
+      </label>
+    </div>
+    <div class="divider"></div>
+    <div class="toolbar-group">
+      <select class="printmode" id="printMode">
+        <option value="notscan">Cetak: Belum Discan Saja</option>
+        <option value="all">Cetak: Semua Data</option>
+      </select>
+      <button class="printbtn" id="printBtn">Print ke PDF</button>
+    </div>
+  </div>
+
+  <div id="summaryWrap"></div>
+  <div id="results">
+    <div class="empty">Belum ada hasil. Isi kedua data lalu klik "Jalankan Perbandingan".</div>
+  </div>
+</main>
+
+<footer>SKU = kolom 1 data sistem · Alamat = kolom 2 data sistem · Qty sistem = kolom 19 data sistem · Keep Stock = kolom 22 data sistem · Data scan = alamat, SKU, qty</footer>
+
+<div id="printArea"></div>
+
+<script>
+function parseLines(text){
+  return text.split(/\r?\n/).map(l=>l.trim()).filter(l=>l.length>0);
+}
+
+// Rows can have stray commas inside the description (col 4) AND inside the
+// trailing repeated/truncated description (last col), which both shift the
+// fixed-position columns (like qty at col 19) out of place. To fix this
+// reliably we anchor on the repeated SKU column, which reliably reappears
+// near the end of every row (col 23 in a clean 24-column row) and is never
+// itself split by a stray comma.
+function normalizeRow(cols, expectedLen){
+  if(cols.length <= expectedLen) return cols;
+
+  const sku = (cols[0]||'').trim();
+  const skuRepeatIdxClean = expectedLen - 2; // index 22 in a clean 24-col row
+
+  // search from the end backward for a field that exactly equals the SKU
+  let j = -1;
+  for(let i = cols.length - 1; i >= 3; i--){
+    if(cols[i].trim() === sku){ j = i; break; }
+  }
+
+  if(j === -1){
+    // fallback: no reliable anchor found, do a best-effort merge at the front only
+    const excess = cols.length - expectedLen;
+    const before = cols.slice(0, 3);
+    const descParts = cols.slice(3, 3 + excess + 1);
+    const after = cols.slice(3 + excess + 1);
+    return [...before, descParts.join(' ').replace(/\s+/g,' ').trim(), ...after];
+  }
+
+  const frontExcess = j - skuRepeatIdxClean; // extra commas found inside the description
+  const descFront = cols.slice(3, 3 + frontExcess + 1).join(' ').replace(/\s+/g,' ').trim();
+  const middle = cols.slice(3 + frontExcess + 1, j); // untouched fixed-position columns
+  const descRepeat = cols.slice(j + 1).join(' ').replace(/\s+/g,' ').trim(); // trailing desc, possibly comma-split too
+
+  return [cols[0], cols[1], cols[2], descFront, ...middle, cols[j], descRepeat];
+}
+
+function parseData1(text){
+  const rows = parseLines(text);
+  const EXPECTED_COLS = 24;
+  let fixedCount = 0;
+  const items = rows.map(line=>{
+    const cleanLine = line.replace(/\t/g,' ');
+    let c = cleanLine.split(',').map(v=>v.trim());
+    if(c.length > EXPECTED_COLS){
+      fixedCount++;
+      c = normalizeRow(c, EXPECTED_COLS);
+    }
+    return {
+      sku: (c[0]||'').trim(),
+      addr: (c[1]||'').trim(),
+      desc: (c[3]||'').trim(),
+      qty: parseFloat((c[18]||'0').trim()) || 0,
+      keepStock: (c[21]||'').trim(),
+      raw: line
+    };
+  }).filter(r=>r.sku && r.addr);
+  items.fixedCount = fixedCount;
+  return items;
+}
+
+function isPureNumeric(str){
+  return /^\d+$/.test((str||'').trim());
+}
+
+function parseData2(text){
+  const rows = parseLines(text);
+  let swappedCount = 0;
+  const itemsWithAddr = [];
+  const itemsSkuOnly = [];
+  let orderCounter = 0;
+
+  rows.forEach(line=>{
+    const c = line.split(',').map(v=>v.trim());
+
+    if(c.length >= 3 && c[0] !== '' && c[1] !== '' && c[2] !== ''){
+      let a = c[0], b = c[1];
+      let addr, sku;
+      if(isPureNumeric(a) && !isPureNumeric(b)){
+        sku = a; addr = b; swappedCount++;
+      } else {
+        addr = a; sku = b;
+      }
+      itemsWithAddr.push({
+        addr, sku,
+        qty: parseFloat((c[2]||'0').trim()) || 0,
+        order: orderCounter++,
+        raw: line
+      });
+    } else if(c.length === 2 && c[0] !== '' && c[1] !== ''){
+      // Only SKU,QTY given — no address. Resolve the address later by
+      // looking the SKU up in the system data instead of comparing per-address.
+      itemsSkuOnly.push({
+        sku: c[0],
+        qty: parseFloat((c[1]||'0').trim()) || 0,
+        order: orderCounter++,
+        raw: line
+      });
+    }
+  });
+
+  itemsWithAddr.swappedCount = swappedCount;
+  return { itemsWithAddr, itemsSkuOnly, swappedCount };
+}
+
+function groupBy(arr, key){
+  const m = new Map();
+  arr.forEach(item=>{
+    const k = item[key];
+    if(!m.has(k)) m.set(k, []);
+    m.get(k).push(item);
+  });
+  return m;
+}
+
+function readFileInto(inputEl, textareaEl, metaEl){
+  inputEl.addEventListener('change', ()=>{
+    const files = Array.from(inputEl.files || []);
+    if(files.length === 0) return;
+
+    const readAsText = (file)=> new Promise((resolve, reject)=>{
+      const reader = new FileReader();
+      reader.onload = e => resolve(e.target.result);
+      reader.onerror = e => reject(e);
+      reader.readAsText(file);
+    });
+
+    Promise.all(files.map(readAsText)).then(contents=>{
+      // Join every file's content with a newline so lines from different
+      // files never get merged together, then trim stray blank lines.
+      const combined = contents
+        .map(c => c.replace(/\r?\n$/,'')) // drop a single trailing newline per file
+        .join('\n');
+      textareaEl.value = combined;
+
+      const totalKB = files.reduce((sum,f)=> sum + f.size, 0) / 1024;
+      if(files.length === 1){
+        metaEl.textContent = files[0].name + ' · ' + totalKB.toFixed(1) + ' KB dimuat';
+      } else {
+        metaEl.textContent = files.length + ' file digabung (' + files.map(f=>f.name).join(', ') + ') · ' + totalKB.toFixed(1) + ' KB total';
+      }
+    }).catch(()=>{
+      metaEl.textContent = 'Gagal membaca salah satu file.';
+    });
+  });
+}
+readFileInto(document.getElementById('file1'), document.getElementById('data1'), document.getElementById('meta1'));
+readFileInto(document.getElementById('file2'), document.getElementById('data2'), document.getElementById('meta2'));
+
+document.getElementById('clearBtn').addEventListener('click', ()=>{
+  document.getElementById('data1').value='';
+  document.getElementById('data2').value='';
+  document.getElementById('meta1').textContent='Belum ada file';
+  document.getElementById('meta2').textContent='Belum ada file';
+  document.getElementById('errMsg').textContent='';
+  document.getElementById('summaryWrap').innerHTML='';
+  document.getElementById('results').innerHTML='<div class="empty">Belum ada hasil. Isi kedua data lalu klik "Jalankan Perbandingan".</div>';
+});
+
+// Global store of the last computed comparison, grouped by address.
+// Each row: {addr, sku, desc, qtySys, qtyScan, selisih, status, remark, skuLen}
+let lastGroups = []; // [{addr, rows:[...]}]
+
+function aggregateScanBySku(items){
+  const m = new Map();
+  items.forEach(it=>{
+    if(m.has(it.sku)){
+      const existing = m.get(it.sku);
+      existing.qty += it.qty;
+      existing.order = Math.min(existing.order, it.order);
+    } else {
+      m.set(it.sku, {addr: it.addr, sku: it.sku, qty: it.qty, order: it.order});
+    }
+  });
+  return Array.from(m.values());
+}
+
+let lastUnresolvedSkuOnly = []; // sku-only scan rows whose SKU wasn't found anywhere in the system
+
+function computeGroups(d1, itemsWithAddr, itemsSkuOnly){
+  const g1 = groupBy(d1, 'addr');
+  const g2 = groupBy(itemsWithAddr, 'addr');
+  const explicitAddrs = new Set(g2.keys());
+
+  // Resolve SKU-only rows against the system data (first match wins).
+  const skuToSysItem = new Map();
+  d1.forEach(item=>{ if(!skuToSysItem.has(item.sku)) skuToSysItem.set(item.sku, item); });
+
+  const skuOnlyByAddr = new Map(); // used only for addresses with NO explicit scan rows
+  lastUnresolvedSkuOnly = [];
+
+  (itemsSkuOnly||[]).forEach(entry=>{
+    const sysItem = skuToSysItem.get(entry.sku);
+    if(!sysItem){
+      lastUnresolvedSkuOnly.push(entry);
+      return;
+    }
+    if(explicitAddrs.has(sysItem.addr)){
+      // Address already has explicit scan rows — fold this SKU into that
+      // address's normal comparison instead of creating a separate view.
+      g2.get(sysItem.addr).push({addr: sysItem.addr, sku: sysItem.sku, qty: entry.qty, order: entry.order});
+    } else {
+      if(!skuOnlyByAddr.has(sysItem.addr)) skuOnlyByAddr.set(sysItem.addr, []);
+      skuOnlyByAddr.get(sysItem.addr).push({sysItem, qtyScan: entry.qty, order: entry.order});
+    }
+  });
+
+  const groups = [];
+  const allAddrs = Array.from(explicitAddrs).sort();
+
+  allAddrs.forEach(addr=>{
+    const sysItems = g1.get(addr) || [];
+    const scanItems = aggregateScanBySku(g2.get(addr) || []);
+    const scanMap = new Map(scanItems.map(s=>[s.sku, s]));
+    const sysSkuSet = new Set(sysItems.map(s=>s.sku));
+
+    const rows = [];
+
+    sysItems.forEach(item=>{
+      const scanned = scanMap.get(item.sku);
+      if(item.qty === 0 && !scanned) return; // skip zero-qty system SKUs that weren't scanned
+
+      if(!scanned){
+        rows.push({
+          addr, sku:item.sku, desc:item.desc, qtySys:item.qty, qtyScan:null,
+          selisih:null, status:'notscan',
+          remark:`SKU ada di sistem untuk alamat ${addr} tapi tidak ditemukan di data scan.`,
+          skuLen: item.sku.length, scanOrder: Infinity, keepStock: item.keepStock
+        });
+      } else if(scanned.qty === item.qty){
+        rows.push({
+          addr, sku:item.sku, desc:item.desc, qtySys:item.qty, qtyScan:scanned.qty,
+          selisih:0, status:'ok', remark:'', skuLen: item.sku.length, scanOrder: scanned.order, keepStock: item.keepStock
+        });
+      } else {
+        const selisih = scanned.qty - item.qty;
+        rows.push({
+          addr, sku:item.sku, desc:item.desc, qtySys:item.qty, qtyScan:scanned.qty,
+          selisih, status:'diff',
+          remark:`Scan ${selisih>0?'+':''}${selisih} dari sistem (${selisih>0?'lebih':'kurang'} ${Math.abs(selisih)}).`,
+          skuLen: item.sku.length, scanOrder: scanned.order, keepStock: item.keepStock
+        });
+      }
+    });
+
+    scanItems.forEach(s=>{
+      if(!sysSkuSet.has(s.sku)){
+        rows.push({
+          addr, sku:s.sku, desc:'', qtySys:null, qtyScan:s.qty,
+          selisih:null, status:'extra',
+          remark:`SKU muncul di data scan untuk alamat ${addr} tapi tidak ada di data sistem.`,
+          skuLen: s.sku.length, scanOrder: s.order, keepStock: ''
+        });
+      }
+    });
+
+    groups.push({addr, sysCount: sysItems.length, scanCount: scanItems.length, rows, partial:false});
+  });
+
+  // Partial groups: addresses inferred purely from SKU+QTY scan rows.
+  // Only the specific scanned SKUs are shown — the rest of that address's
+  // system SKUs are not pulled in, since the scan never claimed to cover them.
+  Array.from(skuOnlyByAddr.keys()).sort().forEach(addr=>{
+    const rawEntries = skuOnlyByAddr.get(addr);
+    const summed = new Map(); // sku -> {sysItem, qtyScan, order}
+    rawEntries.forEach(r=>{
+      if(summed.has(r.sysItem.sku)){
+        const ex = summed.get(r.sysItem.sku);
+        ex.qtyScan += r.qtyScan;
+        ex.order = Math.min(ex.order, r.order);
+      } else {
+        summed.set(r.sysItem.sku, {sysItem: r.sysItem, qtyScan: r.qtyScan, order: r.order});
+      }
+    });
+    const entries = Array.from(summed.values());
+    const rows = entries.map(r=>{
+      const item = r.sysItem;
+      if(r.qtyScan === item.qty){
+        return {addr, sku:item.sku, desc:item.desc, qtySys:item.qty, qtyScan:r.qtyScan,
+          selisih:0, status:'ok',
+          remark:'Dari data scan SKU+Qty (tanpa alamat) — alamat diambil dari sistem.',
+          skuLen: item.sku.length, scanOrder: r.order, keepStock: item.keepStock};
+      }
+      const selisih = r.qtyScan - item.qty;
+      return {addr, sku:item.sku, desc:item.desc, qtySys:item.qty, qtyScan:r.qtyScan,
+        selisih, status:'diff',
+        remark:`Scan ${selisih>0?'+':''}${selisih} dari sistem (${selisih>0?'lebih':'kurang'} ${Math.abs(selisih)}). Dari data scan SKU+Qty (tanpa alamat) — alamat diambil dari sistem.`,
+        skuLen: item.sku.length, scanOrder: r.order, keepStock: item.keepStock};
+    });
+    groups.push({addr, sysCount: rows.length, scanCount: entries.length, rows, partial:true});
+  });
+
+  groups.sort((a,b)=> a.addr.localeCompare(b.addr));
+  return groups;
+}
+
+function skuPasses(row, showLebih){
+  if(showLebih) return true;
+  return row.skuLen === 7;
+}
+
+function renderResults(){
+  const showLebih = document.getElementById('filterLebih').checked;
+
+  let totalSku=0, totalMatch=0, totalNotScan=0, totalDiff=0, totalExtra=0;
+  let groupsHtml = '';
+
+  lastGroups.forEach(g=>{
+    const visibleRows = g.rows.filter(r=>skuPasses(r, showLebih));
+    if(visibleRows.length===0) return;
+
+    let rowsHtml = '';
+    let okCount = 0;
+
+    visibleRows.forEach(r=>{
+      if(r.status==='notscan'){
+        totalSku++; totalNotScan++;
+        rowsHtml += `
+          <tr class="row-notscan">
+            <td class="sku">${r.sku}</td>
+            <td class="desc">${r.desc||'-'}</td>
+            <td class="qty">${r.qtySys}</td>
+            <td class="qty">—</td>
+            <td class="desc">${r.keepStock||'-'}</td>
+            <td class="qty">—</td>
+            <td>
+              <span class="status notscan">Belum discan</span>
+              <div class="remark">${r.remark}</div>
+            </td>
+          </tr>`;
+      } else if(r.status==='ok'){
+        totalSku++; totalMatch++; okCount++;
+        rowsHtml += `
+          <tr>
+            <td class="sku">${r.sku}</td>
+            <td class="desc">${r.desc||'-'}</td>
+            <td class="qty">${r.qtySys}</td>
+            <td class="qty">${r.qtyScan}</td>
+            <td class="desc">${r.keepStock||'-'}</td>
+            <td class="qty">0</td>
+            <td><span class="status ok">Sesuai</span></td>
+          </tr>`;
+      } else if(r.status==='diff'){
+        totalSku++; totalDiff++;
+        const sign = r.selisih>0?'+':'';
+        rowsHtml += `
+          <tr class="row-diff">
+            <td class="sku">${r.sku}</td>
+            <td class="desc">${r.desc||'-'}</td>
+            <td class="qty">${r.qtySys}</td>
+            <td class="qty">${r.qtyScan}</td>
+            <td class="desc">${r.keepStock||'-'}</td>
+            <td class="qty">${sign}${r.selisih}</td>
+            <td>
+              <span class="status diff">Selisih qty</span>
+              <div class="remark">${r.remark}</div>
+            </td>
+          </tr>`;
+      } else if(r.status==='extra'){
+        totalExtra++;
+        rowsHtml += `
+          <tr class="row-extra">
+            <td class="sku">${r.sku}</td>
+            <td class="desc">—</td>
+            <td class="qty">—</td>
+            <td class="qty">${r.qtyScan}</td>
+            <td class="desc">—</td>
+            <td class="qty">—</td>
+            <td>
+              <span class="status extra">Tidak terdaftar</span>
+              <div class="remark">${r.remark}</div>
+            </td>
+          </tr>`;
+      }
+    });
+
+    const sysVisibleCount = visibleRows.filter(r=>r.status!=='extra').length;
+
+    groupsHtml += `
+      <div class="group">
+        <div class="group-head">
+          <span class="addr">${g.addr}</span>
+          <span class="counts">${g.partial ? `${visibleRows.length} SKU dari scan (parsial, alamat dari sistem)` : `${sysVisibleCount} SKU sistem · ${okCount} sesuai · ${g.scanCount} baris scan`}</span>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>SKU</th>
+              <th>Deskripsi</th>
+              <th style="text-align:right">Qty Sistem</th>
+              <th style="text-align:right">Qty Scan</th>
+              <th>Keep Stock</th>
+              <th style="text-align:right">Selisih</th>
+              <th>Status / Remarks</th>
+            </tr>
+          </thead>
+          <tbody>${rowsHtml}</tbody>
+        </table>
+      </div>`;
+  });
+
+  document.getElementById('summaryWrap').innerHTML = `
+    <div class="summary">
+      <div class="stat total"><div class="num">${totalSku}</div><div class="lbl">Total SKU Sistem</div></div>
+      <div class="stat match"><div class="num">${totalMatch}</div><div class="lbl">Sesuai</div></div>
+      <div class="stat notscan"><div class="num">${totalNotScan}</div><div class="lbl">Belum Discan</div></div>
+      <div class="stat diffqty"><div class="num">${totalDiff}</div><div class="lbl">Selisih Qty</div></div>
+      <div class="stat extra"><div class="num">${totalExtra}</div><div class="lbl">Tidak Terdaftar</div></div>
+    </div>`;
+
+  document.getElementById('results').innerHTML = groupsHtml || '<div class="empty">Tidak ada alamat yang cocok dengan filter saat ini.</div>';
+}
+
+document.getElementById('runBtn').addEventListener('click', ()=>{
+  const errEl = document.getElementById('errMsg');
+  errEl.textContent='';
+  const t1 = document.getElementById('data1').value;
+  const t2 = document.getElementById('data2').value;
+
+  if(!t1.trim() || !t2.trim()){
+    errEl.textContent = 'Isi kedua data terlebih dahulu.';
+    return;
+  }
+
+  const d1 = parseData1(t1);
+  const d2 = parseData2(t2);
+
+  if(d1.length===0){ errEl.textContent='Data sistem tidak terbaca — cek format.'; return; }
+  if(d2.itemsWithAddr.length===0 && d2.itemsSkuOnly.length===0){ errEl.textContent='Data scan tidak terbaca — cek format.'; return; }
+
+  lastGroups = computeGroups(d1, d2.itemsWithAddr, d2.itemsSkuOnly);
+
+  const infoParts = [];
+  if(d1.fixedCount > 0) infoParts.push(`${d1.fixedCount} baris data sistem diperbaiki (koma di deskripsi)`);
+  if(d2.swappedCount > 0) infoParts.push(`${d2.swappedCount} baris data scan urutan kolomnya dibalik otomatis`);
+  if(d2.itemsSkuOnly.length > 0) infoParts.push(`${d2.itemsSkuOnly.length} baris data scan hanya SKU+Qty, alamat diambil dari sistem`);
+  if(lastUnresolvedSkuOnly.length > 0) infoParts.push(`${lastUnresolvedSkuOnly.length} SKU dari data scan tidak ditemukan di sistem sama sekali`);
+
+  errEl.style.color = infoParts.length ? 'var(--amber)' : '';
+  errEl.textContent = infoParts.join(' · ');
+
+  document.getElementById('toolbar').style.display = 'flex';
+  renderResults();
+});
+
+document.getElementById('filterLebih').addEventListener('change', renderResults);
+
+function buildPrintArea(mode){
+  const showLebih = document.getElementById('filterLebih').checked;
+  const flatRows = [];
+
+  lastGroups.forEach(g=>{
+    g.rows.filter(r=>skuPasses(r, showLebih)).forEach(r=>{
+      if(mode==='notscan' && r.status!=='notscan') return;
+      flatRows.push(r);
+    });
+  });
+
+  // Order by scan sequence: the SKU scanned first appears at the top, the
+  // SKU scanned last appears at the bottom. Rows never scanned (no scan
+  // order) are pushed to the very end since they have no scan time.
+  flatRows.sort((a,b)=>{
+    const oa = (a.scanOrder===undefined || a.scanOrder===null) ? Infinity : a.scanOrder;
+    const ob = (b.scanOrder===undefined || b.scanOrder===null) ? Infinity : b.scanOrder;
+    return oa - ob;
+  });
+
+  const statusLabel = {
+    ok:'Sesuai', notscan:'Belum Discan', diff:'Selisih Qty', extra:'Tidak Terdaftar'
+  };
+
+  const title = mode==='notscan' ? 'Laporan SKU Belum Discan' : 'Laporan Perbandingan Stok — Semua Data';
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('id-ID', {day:'2-digit',month:'long',year:'numeric'});
+
+  let rowsHtml = '';
+  flatRows.forEach((r,i)=>{
+    const seq = (r.scanOrder===Infinity || r.scanOrder===undefined || r.scanOrder===null) ? '—' : (r.scanOrder+1);
+    rowsHtml += `
+      <tr>
+        <td class="num">${seq}</td>
+        <td>${r.addr}</td>
+        <td>${r.sku}</td>
+        <td>${(r.desc||'-').substring(0,20)}</td>
+        <td class="num">${r.qtySys ?? '—'}</td>
+        <td class="num">${r.qtyScan ?? '—'}</td>
+        <td>${r.keepStock||'-'}</td>
+        <td class="num">${r.selisih===null?'—':(r.selisih>0?'+':'')+r.selisih}</td>
+        <td>${statusLabel[r.status]}</td>
+      </tr>`;
+  });
+
+  document.getElementById('printArea').innerHTML = `
+    <div class="p-title">${title}</div>
+    <div class="p-sub">Dicetak ${dateStr} · Total baris: ${flatRows.length}${showLebih?' · termasuk SKU >7 digit':' · SKU 7 digit'} · Diurutkan sesuai waktu scan (pertama → terakhir)</div>
+    <table>
+      <colgroup>
+        <col style="width:5%"><col style="width:11%"><col style="width:11%"><col style="width:22%">
+        <col style="width:8%"><col style="width:8%"><col style="width:10%"><col style="width:8%"><col style="width:17%">
+      </colgroup>
+      <thead>
+        <tr>
+          <th class="num">No</th><th>Alamat</th><th>SKU</th><th>Deskripsi</th>
+          <th class="num">Qty Sistem</th><th class="num">Qty Scan</th><th>Keep Stock</th><th class="num">Selisih</th><th>Status</th>
+        </tr>
+      </thead>
+      <tbody>${rowsHtml || '<tr><td colspan="9">Tidak ada data untuk kriteria ini.</td></tr>'}</tbody>
+    </table>`;
+}
+
+document.getElementById('printBtn').addEventListener('click', ()=>{
+  if(lastGroups.length===0){
+    document.getElementById('errMsg').textContent = 'Jalankan perbandingan terlebih dahulu sebelum mencetak.';
+    return;
+  }
+  const mode = document.getElementById('printMode').value;
+  buildPrintArea(mode);
+  setTimeout(()=>window.print(), 50);
+});
+</script>
+
 </body>
-</html> 
+</html>
